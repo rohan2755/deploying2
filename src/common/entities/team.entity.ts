@@ -15,6 +15,9 @@ export class Team {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column()
+  name: string;
+
   @ManyToOne(() => User, (user) => user.teams)
   @JoinColumn({ name: 'user_id' })
   user: User;
