@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Commentary } from 'src/common/entities/commentary.entity';
@@ -9,11 +8,14 @@ import { Player } from 'src/common/entities/player.entity';
 import { Score } from 'src/common/entities/score.entity';
 import { ScoreCard } from 'src/common/entities/scorecard.entity';
 import { Team } from 'src/common/entities/team.entity';
+import { User } from 'src/common/entities/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class MatchesService {
   constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
     @InjectRepository(Match)
     private matchRepository: Repository<Match>,
     @InjectRepository(ScoreCard)
@@ -74,6 +76,66 @@ export class MatchesService {
       ])
       .where('contest.match_id = :matchId', { matchId })
       .groupBy('contest.id')
+      .getRawMany();
+  }
+
+  fetchMyContests(userId: number, matchId: number) {
+    return this.contestParticipantRepository
+      .createQueryBuilder('contestParticipant')
+      .select('contest.id', 'id')
+      .addSelect('contest.entry_fees', 'entry_fees')
+      .addSelect('contest.prize_pool', 'prize_pool')
+      .addSelect('contest.winners', 'winners')
+      .addSelect('contest.entry_type', 'entry_type')
+      .addSelect('contest.spot', 'spot')
+      .addSelect(
+        'JSON_AGG(DISTINCT team.name) FILTER (WHERE team.name IS NOT NULL)',
+        'team_names',
+      )
+      .innerJoin('contestParticipant.contest', 'contest')
+      .innerJoin('contest.match', 'match')
+      .leftJoin('contestParticipant.team', 'team')
+      .where('match.id = :matchId', { matchId })
+      .andWhere('contestParticipant.user_id = :userId', { userId })
+      .groupBy(
+        'contest.id, contest.entry_fees, contest.prize_pool, contest.winners, contest.entry_type',
+      )
+      .getRawMany();
+  }
+
+  fetchMyMatches(userId: number, status: number) {
+    const statusCondition =
+      status === 2 ? 'match.status IN (:...status)' : 'match.status = :status';
+
+    const statusValue = status === 2 ? [2, 4] : status;
+
+    return this.userRepository
+      .createQueryBuilder('user')
+      .select('match.id', 'id')
+      .addSelect('match.title', 'title')
+      .addSelect('match.status', 'status')
+      .addSelect('match.date_start_ist', 'date_start_ist')
+      .addSelect('match.teama', 'teama')
+      .addSelect('match.teamb', 'teamb')
+      .addSelect('competition.title', 'competition_title')
+      .addSelect('competition.match_format', 'competition_match_format')
+      .addSelect('COUNT(DISTINCT team.id)', 'teamCount')
+      .addSelect((subQuery) => {
+        return subQuery
+          .select('COUNT(DISTINCT cp.id)')
+          .from(ContestParticipant, 'cp')
+          .innerJoin('cp.contest', 'c')
+          .where('cp.user_id = :userId', { userId })
+          .andWhere('c.match_id = match.id');
+      }, 'contestCount')
+      .innerJoin('user.teams', 'team')
+      .innerJoin('team.match', 'match')
+      .innerJoin('match.competition', 'competition')
+      .where('user.id = :userId', { userId })
+      .andWhere(status !== undefined ? statusCondition : '1=1', {
+        status: statusValue,
+      })
+      .groupBy('match.id, competition.title, competition.match_format')
       .getRawMany();
   }
 

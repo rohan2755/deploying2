@@ -41,6 +41,22 @@ export class MatchesController {
     return this.matchesService.fetchContests(matchId);
   }
 
+  @Get(':id/contests/my')
+  fetchMyContests(
+    @CurrentUser() user: JwtUser,
+    @Param('id', ParseIntPipe) matchId: number,
+  ) {
+    return this.matchesService.fetchMyContests(user.userId, matchId);
+  }
+
+  @Get('my')
+  fetchMyMatches(
+    @CurrentUser() user: JwtUser,
+    @Query('status', ParseIntPipe) status: number,
+  ) {
+    return this.matchesService.fetchMyMatches(user.userId, status);
+  }
+
   @Get(':id/teams')
   fetchTeams(
     @CurrentUser() user: JwtUser,

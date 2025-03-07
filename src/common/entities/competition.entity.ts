@@ -33,6 +33,9 @@ export class Competition {
   @Column()
   total_teams: number;
 
+  @Column()
+  match_format: string;
+
   @OneToMany(() => Match, (match) => match.competition)
   matches: Match[];
 }
