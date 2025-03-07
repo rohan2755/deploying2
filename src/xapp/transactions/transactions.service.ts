@@ -21,7 +21,17 @@ export class TransactionsService {
       user: { id: userId },
     });
 
+    const sortOrder = {
+      promotional: 1,
+      deposit: 2,
+      trading: 3,
+      winning: 4,
+    };
+
+    userWallets.sort((a, b) => sortOrder[a.type] - sortOrder[b.type]);
+
     const transactionWallets: Partial<TransactionWallet>[] = [];
+    const newUserWallets: Partial<Wallet>[] = [];
     if (createTransactionDto.type == 'debit') {
       let remainingAmount = createTransactionDto.amount;
 
@@ -31,10 +41,16 @@ export class TransactionsService {
           uw.balance,
           remainingAmount,
         );
-        uw.balance -= amountToSubtractFromWallet;
         transactionWallets.push({
+          id: uw.id,
           wallet_type: uw.type,
-          amount: uw.balance,
+          amount: amountToSubtractFromWallet,
+        });
+        newUserWallets.push({
+          id: uw.id,
+          user: uw.user,
+          balance: uw.balance - amountToSubtractFromWallet,
+          type: uw.type,
         });
         remainingAmount -= amountToSubtractFromWallet;
       }
@@ -58,13 +74,13 @@ export class TransactionsService {
       }
     }
 
-    const transaction = this.transactionRepository.create({
+    await this.transactionRepository.save({
       ...createTransactionDto,
       user: { id: userId },
       date: new TZDate(),
       transactionWallets: transactionWallets,
     });
 
-    await this.transactionRepository.save(transaction);
+    await this.walletRepository.save(newUserWallets);
   }
 }

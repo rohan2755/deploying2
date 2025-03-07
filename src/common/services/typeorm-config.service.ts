@@ -17,6 +17,7 @@ import { Transaction } from '../entities/transaction.entity';
 import { TransactionWallet } from '../entities/transaction_wallet.entity';
 import { Contest } from '../entities/contest.entity';
 import { PrizeDistribution } from '../entities/prize-distribution.entity';
+import { ContestParticipant } from '../entities/contest-participant.entity';
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
@@ -47,6 +48,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
         TransactionWallet,
         Contest,
         PrizeDistribution,
+        ContestParticipant,
       ],
     };
   }

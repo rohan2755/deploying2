@@ -9,6 +9,7 @@ import { Team } from './team.entity';
 import { Payment } from './payment.entity';
 import { Wallet } from './wallet.entity';
 import { Transaction } from './transaction.entity';
+import { ContestParticipant } from './contest-participant.entity';
 
 @Entity({ name: 'users', schema: 'public' })
 export class User {
@@ -47,4 +48,10 @@ export class User {
 
   @OneToMany(() => Transaction, (transaction) => transaction.user)
   transactions: Transaction[];
+
+  @OneToMany(
+    () => ContestParticipant,
+    (contestParticipant) => contestParticipant.user,
+  )
+  contestParticipants: ContestParticipant[];
 }

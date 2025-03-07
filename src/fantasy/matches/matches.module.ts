@@ -8,6 +8,8 @@ import { Score } from 'src/common/entities/score.entity';
 import { Commentary } from 'src/common/entities/commentary.entity';
 import { Player } from 'src/common/entities/player.entity';
 import { Team } from 'src/common/entities/team.entity';
+import { Contest } from 'src/common/entities/contest.entity';
+import { ContestParticipant } from 'src/common/entities/contest-participant.entity';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { Team } from 'src/common/entities/team.entity';
       Commentary,
       Player,
       Team,
+      Contest,
+      ContestParticipant,
     ]),
   ],
   controllers: [MatchesController],

@@ -36,8 +36,10 @@ export class WalletsService {
     });
   }
 
-  details(userId: number) {
-    return this.walletRepository.findBy({ user: { id: userId } });
+  async details(userId: number) {
+    return await this.walletRepository.findBy({
+      user: { id: userId },
+    });
   }
 
   create(userId: number) {
@@ -45,12 +47,12 @@ export class WalletsService {
       {
         user: { id: userId },
         type: 'promotional',
-        balance: 0,
+        balance: 280,
       },
       {
         user: { id: userId },
         type: 'deposit',
-        balance: 0,
+        balance: 720,
       },
       {
         user: { id: userId },

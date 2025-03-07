@@ -2,6 +2,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Commentary } from 'src/common/entities/commentary.entity';
+import { ContestParticipant } from 'src/common/entities/contest-participant.entity';
+import { Contest } from 'src/common/entities/contest.entity';
 import { Match } from 'src/common/entities/match.entity';
 import { Player } from 'src/common/entities/player.entity';
 import { Score } from 'src/common/entities/score.entity';
@@ -24,6 +26,10 @@ export class MatchesService {
     private playerRepository: Repository<Player>,
     @InjectRepository(Team)
     private teamRepository: Repository<Team>,
+    @InjectRepository(Contest)
+    private contestRepository: Repository<Contest>,
+    @InjectRepository(ContestParticipant)
+    private contestParticipantRepository: Repository<ContestParticipant>,
   ) {}
 
   fetchMatches(status: number, competitionId: number) {
@@ -49,6 +55,26 @@ export class MatchesService {
 
   fetchPlayers(matchId: number) {
     return this.playerRepository.findBy({ match: { id: matchId } });
+  }
+
+  fetchContests(matchId: number) {
+    return this.contestRepository
+      .createQueryBuilder('contest')
+      .leftJoinAndSelect('contest.contestParticipants', 'participant')
+      .select([
+        'contest.id as id',
+        'contest.match_id as match_id',
+        'contest.spot as spot',
+        'contest.entry_fees as entry_fees',
+        'contest.prize_pool as prize_pool',
+        'contest.winners as winners',
+        'contest.entry_type as entry_type',
+        'contest.team_size as team_size',
+        'COUNT(participant.id) AS participantCount',
+      ])
+      .where('contest.match_id = :matchId', { matchId })
+      .groupBy('contest.id')
+      .getRawMany();
   }
 
   async fetchTeams(userId: number, matchId: number) {

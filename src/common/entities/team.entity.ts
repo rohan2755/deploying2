@@ -9,6 +9,7 @@ import {
 import { User } from './user.entity';
 import { Match } from './match.entity';
 import { TeamPlayer } from './team-player.entity';
+import { ContestParticipant } from './contest-participant.entity';
 
 @Entity({ name: 'teams', schema: 'fantasy' })
 export class Team {
@@ -36,4 +37,10 @@ export class Team {
 
   @Column()
   size: number;
+
+  @OneToMany(
+    () => ContestParticipant,
+    (contestParticipant) => contestParticipant.team,
+  )
+  contestParticipants: ContestParticipant[];
 }

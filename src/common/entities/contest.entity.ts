@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Match } from './match.entity';
 import { PrizeDistribution } from './prize-distribution.entity';
+import { ContestParticipant } from './contest-participant.entity';
 
 @Entity({ name: 'contests', schema: 'fantasy' })
 export class Contest {
@@ -30,7 +31,7 @@ export class Contest {
   entry_type: string;
 
   @Column()
-  team_type: string;
+  team_size: number;
 
   @ManyToOne(() => Match, (match) => match.contests)
   @JoinColumn({ name: 'match_id' })
@@ -44,4 +45,10 @@ export class Contest {
     },
   )
   prizeDistributions: PrizeDistribution[];
+
+  @OneToMany(
+    () => ContestParticipant,
+    (contestParticipant) => contestParticipant.contest,
+  )
+  contestParticipants: ContestParticipant[];
 }
