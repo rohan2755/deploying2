@@ -165,6 +165,7 @@ export class MatchesService {
         leadership_role: string;
       }[] = [];
 
+      // Count roles and teams, and identify leaders
       for (const obj of twp.teamPlayers) {
         roleCount[obj.player.playing_role] =
           (roleCount[obj.player.playing_role] || 0) + 1;
@@ -181,6 +182,14 @@ export class MatchesService {
         }
       }
 
+      // Convert teamCount object to an array of objects with {name, count}
+      const teamsCountArray = Object.entries(teamCount).map(
+        ([teamAbbr, count]) => ({
+          name: teamAbbr,
+          count,
+        }),
+      );
+
       data.push({
         id: twp.id,
         name: twp.name,
@@ -188,7 +197,7 @@ export class MatchesService {
         roles_count: roleCount,
         size: twp.size,
         leaders: leaders,
-        teams_count: teamCount,
+        teams_count: teamsCountArray, // The transformed array
       });
     }
 
