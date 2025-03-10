@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Transaction } from 'src/common/entities/transaction.entity';
 import { Repository } from 'typeorm';
@@ -56,7 +56,7 @@ export class TransactionsService {
       }
 
       if (remainingAmount > 0) {
-        throw new Error('Insufficient Balance');
+        throw new BadRequestException('Insufficient Balance');
       }
     } else {
       if (createTransactionDto.tType == 'recharge') {

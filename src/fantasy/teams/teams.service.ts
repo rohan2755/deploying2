@@ -254,46 +254,48 @@ export class TeamsService {
       return {};
     }
 
-    const roleWisePlayers = {
-      wk: [],
-      bat: [],
-      bowl: [],
-      all: [],
-    };
+    return twp;
 
-    twp.teamPlayers.forEach((twpPlayer) => {
-      const player = twpPlayer.player;
-      const playingRole = player.playing_role;
+    // const roleWisePlayers = {
+    //   wk: [],
+    //   bat: [],
+    //   bowl: [],
+    //   all: [],
+    // };
 
-      const playerData = {
-        id: player.id,
-        title: player.title,
-        logo_url: player.logo_url,
-        fantasy_player_rating: player.fantasy_player_rating,
-        team_abbr: player.team_abbr,
-        point: player.playerPoint ? player.playerPoint.point : null,
-      };
+    // twp.teamPlayers.forEach((twpPlayer) => {
+    //   const player = twpPlayer.player;
+    //   const playingRole = player.playing_role;
 
-      if (roleWisePlayers[playingRole]) {
-        roleWisePlayers[playingRole].push({
-          leadership_role: twpPlayer.leadership_role,
-          players: playerData,
-        });
-      }
-    });
+    //   const playerData = {
+    //     id: player.id,
+    //     title: player.title,
+    //     logo_url: player.logo_url,
+    //     fantasy_player_rating: player.fantasy_player_rating,
+    //     team_abbr: player.team_abbr,
+    //     point: player.playerPoint ? player.playerPoint.point : null,
+    //   };
 
-    const data = {
-      id: twp.id,
-      name: twp.name,
-      total_points: twp.total_points,
-      teamPlayers: [
-        { playing_role: 'wk', players: roleWisePlayers.wk },
-        { playing_role: 'bat', players: roleWisePlayers.bat },
-        { playing_role: 'bowl', players: roleWisePlayers.bowl },
-        { playing_role: 'all', players: roleWisePlayers.all },
-      ],
-    };
+    //   if (roleWisePlayers[playingRole]) {
+    //     roleWisePlayers[playingRole].push({
+    //       leadership_role: twpPlayer.leadership_role,
+    //       players: playerData,
+    //     });
+    //   }
+    // });
 
-    return data;
+    // const data = {
+    //   id: twp.id,
+    //   name: twp.name,
+    //   total_points: twp.total_points,
+    //   teamPlayers: [
+    //     { playing_role: 'wk', players: roleWisePlayers.wk },
+    //     { playing_role: 'bat', players: roleWisePlayers.bat },
+    //     { playing_role: 'bowl', players: roleWisePlayers.bowl },
+    //     { playing_role: 'all', players: roleWisePlayers.all },
+    //   ],
+    // };
+
+    // return data;
   }
 }

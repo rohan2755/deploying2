@@ -81,17 +81,13 @@ export class ContestsService {
       throw new BadRequestException('Invalid team sizes');
     }
 
-    try {
-      await this.transactionsService.create(userId, {
-        amount: contest.entry_fees,
-        category: 'fantasy',
-        description: 'Joinning Contest',
-        type: 'debit',
-        tType: 'joining',
-      });
-    } catch (error) {
-      throw new BadRequestException(error);
-    }
+    await this.transactionsService.create(userId, {
+      amount: contest.entry_fees,
+      category: 'fantasy',
+      description: 'Joinning Contest',
+      type: 'debit',
+      tType: 'joining',
+    });
 
     await this.contestParticipantRepository.save(
       joinContestDto.team_ids.map((tid) => {
