@@ -1,4 +1,11 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+} from '@nestjs/common';
 import { ContestsService } from './contests.service';
 import { JoinContestDto } from './dtos/join-contest.dto';
 import { JwtUser } from 'src/xapp/auth/interfaces/jwt-user.interface';
@@ -11,5 +18,13 @@ export class ContestsController {
   @Post('/join')
   join(@CurrentUser() user: JwtUser, @Body() joinContestDto: JoinContestDto) {
     return this.contestsService.join(user.userId, joinContestDto);
+  }
+
+  @Get(':id/leaderboard')
+  fetchLeaderboard(
+    @CurrentUser() user: JwtUser,
+    @Param('id', ParseIntPipe) contestId: number,
+  ) {
+    return this.contestsService.fetchLeaderboard(user.userId, contestId);
   }
 }

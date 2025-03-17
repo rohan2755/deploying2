@@ -31,7 +31,7 @@ export class WalletsService {
       },
       order_note: 'Add money into wallet',
       order_tags: {
-        tType: 'recharge',
+        sub_category: 'recharge',
       },
     });
   }
@@ -47,12 +47,12 @@ export class WalletsService {
       {
         user: { id: userId },
         type: 'promotional',
-        balance: 280,
+        balance: 1525.43,
       },
       {
         user: { id: userId },
         type: 'deposit',
-        balance: 720,
+        balance: 8474.57,
       },
       {
         user: { id: userId },

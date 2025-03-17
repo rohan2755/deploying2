@@ -6,6 +6,7 @@ import { JoinContestDto } from './dtos/join-contest.dto';
 import { Team } from 'src/common/entities/team.entity';
 import { ContestParticipant } from 'src/common/entities/contest-participant.entity';
 import { TransactionsService } from 'src/xapp/transactions/transactions.service';
+import { LeaderBoard } from 'src/common/entities/leaderboard.entity';
 
 @Injectable()
 export class ContestsService {
@@ -17,6 +18,8 @@ export class ContestsService {
     @InjectRepository(Team)
     private teamRepository: Repository<Team>,
     private readonly transactionsService: TransactionsService,
+    @InjectRepository(LeaderBoard)
+    private leaderboardRepository: Repository<LeaderBoard>,
   ) {}
 
   async join(userId: number, joinContestDto: JoinContestDto) {
@@ -81,12 +84,12 @@ export class ContestsService {
       throw new BadRequestException('Invalid team sizes');
     }
 
-    await this.transactionsService.create(userId, {
+    const transaction = await this.transactionsService.create(userId, {
       amount: contest.entry_fees,
       category: 'fantasy',
-      description: 'Joinning Contest',
+      description: contest.match.title,
       type: 'debit',
-      tType: 'joining',
+      sub_category: 'joining',
     });
 
     await this.contestParticipantRepository.save(
@@ -95,6 +98,7 @@ export class ContestsService {
           contest: { id: contest.id },
           user: { id: userId },
           team: { id: tid },
+          debitTransaction: { id: transaction.id },
         };
       }) as ContestParticipant[],
     );
@@ -102,5 +106,45 @@ export class ContestsService {
     return {
       message: 'Join contest successfully',
     };
+  }
+
+  async fetchLeaderboard(userId: number, contestId: number) {
+    // Fetch all leaderboard data
+    const leaderboard = await this.leaderboardRepository.find({
+      select: {
+        id: true,
+        rank: true,
+        prize: true,
+        contestParticipant: {
+          id: true,
+          user: {
+            username: true,
+          },
+          team: {
+            name: true,
+            total_points: true,
+          },
+        },
+      },
+      where: { contest_id: contestId },
+      relations: {
+        contestParticipant: {
+          user: true,
+          team: true,
+        },
+      },
+    });
+
+    // Find the user entry and move it to the top
+    const userEntryIndex = leaderboard.findIndex(
+      (entry) => entry.contestParticipant.user.id === userId,
+    );
+
+    if (userEntryIndex !== -1) {
+      const userEntry = leaderboard.splice(userEntryIndex, 1)[0]; // Remove the user entry from the list
+      leaderboard.unshift(userEntry); // Add the user entry at the start
+    }
+
+    return leaderboard;
   }
 }

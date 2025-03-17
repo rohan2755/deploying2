@@ -9,6 +9,7 @@ import {
 import { Match } from './match.entity';
 import { PrizeDistribution } from './prize-distribution.entity';
 import { ContestParticipant } from './contest-participant.entity';
+import { LeaderBoard } from './leaderboard.entity';
 
 @Entity({ name: 'contests', schema: 'fantasy' })
 export class Contest {
@@ -51,4 +52,7 @@ export class Contest {
     (contestParticipant) => contestParticipant.contest,
   )
   contestParticipants: ContestParticipant[];
+
+  @OneToMany(() => LeaderBoard, (leaderBoard) => leaderBoard.contest)
+  leaderboards: LeaderBoard[];
 }

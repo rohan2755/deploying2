@@ -3,5 +3,5 @@ export class CreateTransactionDto {
   amount: number;
   description: string;
   category: string;
-  tType: string;
+  sub_category: string;
 }

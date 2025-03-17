@@ -32,6 +32,7 @@ export class TransactionsService {
 
     const transactionWallets: Partial<TransactionWallet>[] = [];
     const newUserWallets: Partial<Wallet>[] = [];
+
     if (createTransactionDto.type == 'debit') {
       let remainingAmount = createTransactionDto.amount;
 
@@ -41,40 +42,57 @@ export class TransactionsService {
           uw.balance,
           remainingAmount,
         );
-        transactionWallets.push({
-          id: uw.id,
-          wallet_type: uw.type,
-          amount: amountToSubtractFromWallet,
-        });
-        newUserWallets.push({
-          id: uw.id,
-          user: uw.user,
-          balance: uw.balance - amountToSubtractFromWallet,
-          type: uw.type,
-        });
+        if (amountToSubtractFromWallet > 0) {
+          transactionWallets.push({
+            // id: uw.id,/
+            wallet_type: uw.type,
+            amount: amountToSubtractFromWallet,
+          });
+          newUserWallets.push({
+            id: uw.id,
+            user: uw.user,
+            balance: uw.balance - amountToSubtractFromWallet,
+            type: uw.type,
+          });
+        }
         remainingAmount -= amountToSubtractFromWallet;
       }
 
       if (remainingAmount > 0) {
         throw new BadRequestException('Insufficient Balance');
       }
-    } else {
-      if (createTransactionDto.tType == 'recharge') {
-        const gstAmount = (createTransactionDto.amount % 28) / 100;
+    } else if (createTransactionDto.type == 'credit') {
+      if (createTransactionDto.sub_category == 'recharge') {
+        const depositAmount = createTransactionDto.amount / 1.18;
+        const gstAmount = createTransactionDto.amount - depositAmount;
         transactionWallets.push(
           {
             wallet_type: 'deposit',
-            amount: createTransactionDto.amount - gstAmount,
+            amount: depositAmount,
           },
           {
             wallet_type: 'promotional',
             amount: gstAmount,
           },
         );
+
+        for (const uw of userWallets) {
+          if (uw.type == 'deposit' || uw.type == 'promotional') {
+            const tBalance = uw.type == 'deposit' ? depositAmount : gstAmount;
+            const newBalance = uw.balance + tBalance;
+
+            newUserWallets.push({
+              id: uw.id,
+              user: uw.user,
+              balance: newBalance,
+              type: uw.type,
+            });
+          }
+        }
       }
     }
 
-    await this.transactionRepository.save({
+    const transaction = await this.transactionRepository.save({
       ...createTransactionDto,
       user: { id: userId },
       date: new TZDate(),
@@ -82,5 +100,16 @@ export class TransactionsService {
     });
 
     await this.walletRepository.save(newUserWallets);
+
+    return transaction;
+  }
+
+  async fetchTransactions(userId: number) {
+    return this.transactionRepository.find({
+      where: { user: { id: userId } },
+      relations: {
+        transactionWallets: true,
+      },
+    });
   }
 }

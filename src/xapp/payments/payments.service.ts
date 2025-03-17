@@ -91,10 +91,10 @@ export class PaymentsService implements OnModuleInit {
       if (status === 'success') {
         await this.transactionService.create(userId, {
           amount: order.order_amount,
-          category: 'fantasy',
+          category: 'xapp',
           description: 'Add money into wallet',
           type: 'credit',
-          tType: 'recharge',
+          sub_category: 'recharge',
         });
       }
     } catch {

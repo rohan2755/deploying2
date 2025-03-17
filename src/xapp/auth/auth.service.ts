@@ -26,9 +26,13 @@ export class AuthService {
   async phoneVerify(phoneVerifyDto: PhoneVerifyDto) {
     const otp = Math.floor(100000 + Math.random() * 900000);
 
+    const randomSuffix = Math.floor(Math.random() * 1000);
+    const username = 'Yodha'.toLowerCase() + randomSuffix;
+
     const nUser = this.userRepository.create({
       ...phoneVerifyDto,
       otp: otp.toString(),
+      username: username,
     });
 
     this.eventEmitter.emit('send-otp', phoneVerifyDto.phone, otp);
