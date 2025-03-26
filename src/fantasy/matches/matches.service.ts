@@ -176,7 +176,7 @@ export class MatchesService {
         if (['c', 'vc', 'pp'].includes(obj.leadership_role)) {
           leaders.push({
             name: obj.player.title,
-            logo_url: obj.player.logo_url,
+            logo_url: obj.player.profile_image,
             leadership_role: obj.leadership_role,
           });
         }
