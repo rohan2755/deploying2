@@ -58,6 +58,9 @@ export class Player {
   @Column()
   team_abbr: string;
 
+  @Column()
+  profile_image: string;
+
   @ManyToOne(() => Match, (match) => match.players)
   @JoinColumn({ name: 'match_id' })
   match: Match;
