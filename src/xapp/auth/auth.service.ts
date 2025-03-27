@@ -50,7 +50,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid OTP');
     }
 
-    user.otp = null;
+    // user.otp = null;
     await this.userRepository.save(user);
 
     const wallets = await this.walletService.details(user.id);
