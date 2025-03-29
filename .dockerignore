@@ -1,0 +1,25 @@
+# Ignore node_modules directory (they will be installed inside Docker image)
+node_modules/
+
+# Ignore npm-debug log file
+npm-debug.log
+
+# Ignore Git repository and related files
+.git/
+.gitignore
+
+# Ignore Docker-related files (optional, if you don’t want to copy them)
+Dockerfile
+.dockerignore
+
+# Ignore the README file (optional, if not needed in the image)
+README.md
+
+# Ignore GitHub directory (CI/CD configuration files or actions)
+.github/
+
+# Ignore Disk
+dist/
+
+# Ignore Test
+test/
