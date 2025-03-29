@@ -1,0 +1,14 @@
+services:
+  server:
+    container_name: yoursay-api
+    build:
+      context: .
+    environment:
+      NODE_ENV: production
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/app
+    restart: unless-stopped
+    env_file:
+      - .env
